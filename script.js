@@ -29,7 +29,7 @@ if (themeBtn) {
 
 // Plissee-Intro: öffnet sich beim Scrollen nach oben
 const seite = document.querySelector(".seite");
-if (seite && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+if (seite && document.body.hasAttribute("data-plissee") && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   document.documentElement.classList.add("plissee-an");
   const plissee = document.createElement("div");
   plissee.className = "plissee";
@@ -58,7 +58,9 @@ if (seite && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     breite = innerWidth;
     const navH = document.querySelector(".nav").offsetHeight;
     document.documentElement.style.setProperty("--nav-h", navH + "px");
-    hoehe = innerHeight - navH - 10;   // unter dem Menü, mit Platz für den Griff
+    const leiste = document.querySelector(".cta-leiste");
+    const leisteH = leiste && getComputedStyle(leiste).display !== "none" ? leiste.offsetHeight : 0;
+    hoehe = innerHeight - navH - leisteH - 10;   // zwischen Menü und Kontaktleiste, mit Platz für den Griff
     weg = Math.round(innerHeight * 0.85);
     document.documentElement.style.setProperty("--oeffnen", weg + "px");
     zeichne();

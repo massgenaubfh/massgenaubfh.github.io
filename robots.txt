@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://massgenaubfh.github.io/sitemap.xml
