@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 92" role="img" aria-label="Maßgenau &amp; Mehr">
+  <defs>
+    <pattern id="netz" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="4" fill="#0b1a21"/>
+      <path d="M0 .5H4M.5 0V4" stroke="#8c979e" stroke-width=".7"/>
+    </pattern>
+    <pattern id="falten" width="8" height="7" patternUnits="userSpaceOnUse">
+      <rect width="8" height="7" fill="#0a8590"/>
+      <rect width="8" height="3.5" fill="#4ab3bf"/>
+    </pattern>
+    <linearGradient id="rahmen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef1f3"/>
+      <stop offset="1" stop-color="#9aa4ab"/>
+    </linearGradient>
+  </defs>
+  <!-- linke Hälfte: Fliegengitter -->
+  <path d="M4 4h26l32 54-11 20-21-36v46H4z" fill="url(#netz)" stroke="url(#rahmen)" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- rechte Hälfte: Plissee -->
+  <path d="M51 78 92 4h24v84H94V40L69 88H57z" fill="url(#falten)"/>
+  <path d="M51 78 92 4h24" fill="none" stroke="#7fd0d9" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>
