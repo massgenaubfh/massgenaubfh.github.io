@@ -108,6 +108,11 @@ if (form) {
   const vorwahl = new URLSearchParams(location.search).get("produkt");
   const passend = { fliegengitter: "Fliegengitter", plissee: "Plissee" }[vorwahl];
   if (passend) form.querySelector(`[name="produkt"][value="${passend}"]`).checked = true;
+  const ortVorwahl = new URLSearchParams(location.search).get("ort");
+  const ortFeld = ortVorwahl && form.querySelector(`[name="ort"][value="${CSS.escape(ortVorwahl)}"]`);
+  if (ortFeld) ortFeld.checked = true;
+  const ortName = new URLSearchParams(location.search).get("ortname");
+  if (ortName) form.elements.ortname.value = ortName;
 
   function zeige(i) {
     aktuell = i;
@@ -237,6 +242,142 @@ if (form) {
   });
   form.addEventListener("submit", (e) => e.preventDefault());
   zeige(0);
+}
+
+// Interaktive Einsatzgebiet-Karte (lädt OpenFreeMap erst nach Zustimmung)
+const karte = document.getElementById("karte");
+if (karte) {
+  const laden = () => new Promise((fertig, fehler) => {
+    if (window.maplibregl) return fertig();
+    const css = document.createElement("link");
+    css.rel = "stylesheet";
+    css.href = "vendor/maplibre/maplibre-gl.css";
+    document.head.append(css);
+    const js = document.createElement("script");
+    js.src = "vendor/maplibre/maplibre-gl.js";
+    js.onload = fertig;
+    js.onerror = fehler;
+    document.head.append(js);
+  });
+
+  // Entfernung in km (Haversine)
+  const entfernung = (a, b) => {
+    const r = Math.PI / 180, dLat = (b[0] - a[0]) * r, dLon = (b[1] - a[1]) * r;
+    const h = Math.sin(dLat / 2) ** 2 + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLon / 2) ** 2;
+    return 6371 * 2 * Math.asin(Math.sqrt(h));
+  };
+
+  // Dunkles Kartendesign passend zur CI: Farben der Grundkarte umfärben
+  let original = null;
+  const faerben = (map) => {
+    const dunkel = document.documentElement.dataset.theme !== "light";
+    if (!original) original = map.getStyle().layers.map((l) => ({ id: l.id, type: l.type, paint: { ...(l.paint || {}) } }));
+    original.forEach(({ id, type, paint }) => {
+      const setze = (k, v) => { try { map.setPaintProperty(id, k, v); } catch (e) {} };
+      const zurueck = (k) => setze(k, paint[k] ?? null);
+      if (id.startsWith("ma-")) return;
+      if (type === "background") dunkel ? setze("background-color", "#041a21") : zurueck("background-color");
+      if (type === "fill") dunkel ? setze("fill-color", /water/.test(id) ? "#0b3a44" : "#06252e") : zurueck("fill-color");
+      if (type === "line") dunkel ? setze("line-color", /water|river/.test(id) ? "#14596a" : /boundary/.test(id) ? "#2b5560" : "#1c4652") : zurueck("line-color");
+      if (type === "symbol") {
+        dunkel ? setze("text-color", "#b9c4ca") : zurueck("text-color");
+        dunkel ? setze("text-halo-color", "#031218") : zurueck("text-halo-color");
+      }
+    });
+  };
+
+  const starten = async () => {
+    await laden();
+    karte.classList.add("geladen");
+    const flaeche = document.createElement("div");
+    flaeche.className = "karte-flaeche";
+    karte.append(flaeche);
+    const [zLat, zLon] = karte.dataset.zentrum.split(",").map(Number);
+    const radius = Number(karte.dataset.radius);
+    const orte = JSON.parse(karte.dataset.orte);
+
+    // Kreis als Fläche (64 Punkte)
+    const kreis = [];
+    for (let i = 0; i <= 64; i++) {
+      const w = (i / 64) * 2 * Math.PI;
+      kreis.push([zLon + (radius / (111.32 * Math.cos(zLat * Math.PI / 180))) * Math.sin(w), zLat + (radius / 111.2) * Math.cos(w)]);
+    }
+    const lons = kreis.map((p) => p[0]), lats = kreis.map((p) => p[1]);
+
+    const map = new maplibregl.Map({
+      container: flaeche,
+      style: "https://tiles.openfreemap.org/styles/positron",
+      bounds: [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]],
+      fitBoundsOptions: { padding: 16 },
+      cooperativeGestures: true,
+      attributionControl: { compact: true },
+      locale: {
+        "CooperativeGesturesHandler.WindowsHelpText": "Strg + Mausrad zum Zoomen",
+        "CooperativeGesturesHandler.MacHelpText": "⌘ + Mausrad zum Zoomen",
+        "CooperativeGesturesHandler.MobileHelpText": "Mit zwei Fingern verschieben",
+        "NavigationControl.ZoomIn": "Vergrößern",
+        "NavigationControl.ZoomOut": "Verkleinern",
+      },
+    });
+    karte._map = map;
+    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-left");
+
+    map.on("load", () => {
+      faerben(map);
+      // Quellenhinweis zugeklappt starten (Info-Knopf klappt ihn auf)
+      const attrib = flaeche.querySelector(".maplibregl-ctrl-attrib");
+      if (attrib) attrib.classList.remove("maplibregl-compact-show");
+      map.addSource("ma-gebiet", { type: "geojson", data: { type: "Feature", geometry: { type: "Polygon", coordinates: [kreis] } } });
+      map.addLayer({ id: "ma-gebiet-flaeche", type: "fill", source: "ma-gebiet", paint: { "fill-color": "#0a8590", "fill-opacity": 0.12 } });
+      map.addLayer({ id: "ma-gebiet-rand", type: "line", source: "ma-gebiet", paint: { "line-color": "#4ab3bf", "line-width": 2.5, "line-dasharray": [3, 2] } });
+    });
+    const themeKnopf = document.querySelector(".theme-btn");
+    if (themeKnopf) themeKnopf.addEventListener("click", () => { if (map.isStyleLoaded()) faerben(map); });
+
+    const anfrage = (ort) => {
+      const bekannt = ["Heilbronn", "Neckarsulm", "Bad Friedrichshall"].includes(ort);
+      return `anfrage.html?ort=${encodeURIComponent(bekannt ? ort : "anderer Ort")}${bekannt ? "" : "&ortname=" + encodeURIComponent(ort)}`;
+    };
+    const status = (km) => km <= radius
+      ? '<span class="im-gebiet">✓ Im Einsatzgebiet</span>'
+      : '<span class="ausserhalb">Knapp außerhalb, fragen Sie gern trotzdem an</span>';
+    const popup = (html) => new maplibregl.Popup({ offset: 14, maxWidth: "260px" }).setHTML(html);
+
+    const zentrum = document.createElement("div");
+    zentrum.className = "k-marker";
+    zentrum.setAttribute("aria-label", "Firmensitz Bad Friedrichshall");
+    new maplibregl.Marker({ element: zentrum }).setLngLat([zLon, zLat])
+      .setPopup(popup(`<strong>Bad Friedrichshall</strong><br>Unser Firmensitz<br><a class="more" href="${anfrage("Bad Friedrichshall")}">Jetzt anfragen</a>`))
+      .addTo(map);
+
+    orte.forEach(([name, lat, lon, wichtig]) => {
+      const km = Math.round(entfernung([zLat, zLon], [lat, lon]));
+      const el = document.createElement("button");
+      el.type = "button";
+      el.className = "k-ortpunkt" + (wichtig ? " wichtig" : "");
+      el.setAttribute("aria-label", name);
+      new maplibregl.Marker({ element: el }).setLngLat([lon, lat])
+        .setPopup(popup(`<strong>${name}</strong><br>ca. ${km} km von Bad Friedrichshall<br>${status(km)}<br><a class="more" href="${anfrage(name)}">In ${name} anfragen</a>`))
+        .addTo(map);
+      el.setAttribute("aria-label", name);   // MapLibre setzt sonst "Map marker"
+      el.title = name;
+    });
+
+    map.on("click", (ev) => {
+      if (ev.originalEvent.target.closest(".k-ortpunkt, .k-marker")) return;   // Ortspunkte haben eigene Popups
+      const km = Math.round(entfernung([zLat, zLon], [ev.lngLat.lat, ev.lngLat.lng]));
+      popup(`<strong>ca. ${km} km</strong> von Bad Friedrichshall<br>${status(km)}<br><a class="more" href="anfrage.html">Jetzt anfragen</a>`)
+        .setLngLat(ev.lngLat).addTo(map);
+    });
+  };
+
+  let immer = false;
+  try { immer = localStorage.getItem("karte") === "immer"; } catch (e) {}
+  karte.querySelector(".karte-laden").addEventListener("click", () => {
+    if (karte.querySelector(".karte-merken").checked) { try { localStorage.setItem("karte", "immer"); } catch (e) {} }
+    starten().catch(() => { karte.querySelector(".karte-hinweis p").textContent = "Die Karte konnte gerade nicht geladen werden. Bitte versuchen Sie es später noch einmal."; });
+  });
+  if (immer) starten();
 }
 
 // Einblenden beim Scrollen
