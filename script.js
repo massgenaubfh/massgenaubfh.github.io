@@ -117,6 +117,7 @@ if (form) {
     balken.style.width = ((i + 1) / schritte.length) * 100 + "%";
     info.textContent = `Schritt ${i + 1} von ${schritte.length}`;
     zurueck.hidden = i === 0;
+    weiter.hidden = i < 2;   // Schritt 1 und 2 gehen beim Antippen automatisch weiter
     weiter.textContent = i === schritte.length - 1 ? "Empfehlung anzeigen" : "Weiter";
     fehler.hidden = true;
   }
@@ -211,6 +212,28 @@ if (form) {
     const ohne = form.elements.unbekannt.checked;
     form.elements.breite.disabled = form.elements.hoehe.disabled = ohne;
     fehler.hidden = true;
+  });
+  let timer;
+  form.addEventListener("click", (e) => {
+    const eingabe = e.target.closest(".option input");
+    if (!eingabe) return;
+    clearTimeout(timer);
+    let fertig = false;
+    if (aktuell === 0) fertig = true;
+    if (aktuell === 1) {
+      fertig = wert("einsatz") && (!mitPlissee() || wert("wunsch"));
+      // Beim Plissee nach dem Einsatzort zur zweiten Frage scrollen
+      if (!fertig && eingabe.name === "einsatz") {
+        wunschBlock.hidden = false;
+        setTimeout(() => wunschBlock.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
+      }
+    }
+    if (!fertig) return;
+    timer = setTimeout(() => {
+      zeige(aktuell + 1);
+      const oben = form.getBoundingClientRect().top;
+      if (oben < 70 || oben > innerHeight * 0.5) scrollTo({ top: oben + scrollY - 80, behavior: "smooth" });
+    }, 280);
   });
   form.addEventListener("submit", (e) => e.preventDefault());
   zeige(0);
