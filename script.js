@@ -29,7 +29,9 @@ if (themeBtn) {
 
 // Plissee-Intro: öffnet sich beim Scrollen nach oben
 const seite = document.querySelector(".seite");
-if (seite && document.body.hasAttribute("data-plissee") && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+let plisseeGesehen = false;
+try { plisseeGesehen = sessionStorage.getItem("plissee") === "1"; sessionStorage.setItem("plissee", "1"); } catch (e) {}
+if (seite && document.body.hasAttribute("data-plissee") && !plisseeGesehen && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   document.documentElement.classList.add("plissee-an");
   const plissee = document.createElement("div");
   plissee.className = "plissee";
