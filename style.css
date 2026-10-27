@@ -79,7 +79,7 @@ p{margin:0}
 .links{display:flex;flex-wrap:wrap;gap:1rem 1.5rem;justify-content:center;align-items:center;margin-top:2rem}
 
 /* Navigation */
-.nav{position:sticky;top:0;z-index:50;background:var(--nav-bg);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--nav-line);transition:background-color .3s}
+.nav{position:sticky;top:0;z-index:90;background:var(--nav-bg);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--nav-line);transition:background-color .3s}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;height:64px}
 .brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;color:var(--fg);line-height:1}
 .brand img{width:40px;height:auto}
@@ -216,7 +216,7 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 /* Platz zum Scrollen, während die Seite oben stehen bleibt und das Plissee aufgeht */
 html.plissee-an body::after{content:"";display:block;height:var(--oeffnen,0px)}
 html.plissee-an .seite{position:sticky;top:0}
-.plissee{position:fixed;top:0;left:0;right:0;z-index:80;height:100vh;display:flex;flex-direction:column;pointer-events:none;will-change:height}
+.plissee{position:fixed;top:var(--nav-h,64px);left:0;right:0;z-index:80;height:100vh;display:flex;flex-direction:column;pointer-events:none;will-change:height}
 .plissee .kopf{flex:none;height:14px;background:linear-gradient(var(--schiene-a),var(--schiene-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
 .plissee .stoff{--falte:22px;flex:1;position:relative;overflow:hidden;background-image:
   radial-gradient(ellipse 70% 55% at 50% 35%,rgba(255,255,255,.07),transparent 70%),
