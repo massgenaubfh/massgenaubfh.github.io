@@ -9,6 +9,24 @@ if (btn && menu) {
   });
 }
 
+// Hell/Dunkel umschalten
+const themeBtn = document.querySelector(".theme-btn");
+const themeMeta = document.querySelector('meta[name="theme-color"]');
+function setzeDesign(hell) {
+  if (hell) document.documentElement.dataset.theme = "light";
+  else delete document.documentElement.dataset.theme;
+  if (themeMeta) themeMeta.content = hell ? "#ffffff" : "#031218";
+  if (themeBtn) themeBtn.setAttribute("aria-label", hell ? "Dunkles Design einschalten" : "Helles Design einschalten");
+}
+if (themeBtn) {
+  setzeDesign(document.documentElement.dataset.theme === "light");
+  themeBtn.addEventListener("click", () => {
+    const hell = document.documentElement.dataset.theme !== "light";
+    setzeDesign(hell);
+    try { localStorage.setItem("theme", hell ? "light" : "dark"); } catch (e) {}
+  });
+}
+
 // Einblenden beim Scrollen
 const teile = document.querySelectorAll(".rise");
 if ("IntersectionObserver" in window) {
