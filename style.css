@@ -210,23 +210,24 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 @media (max-width:760px){.foot{grid-template-columns:1fr}}
 
 /* Plissee-Intro: deckt die Seite beim Laden ab und faltet sich beim Scrollen nach oben (per Script eingeschaltet) */
-:root{--falte-linie:#021419;--falte-hell:#14505d;--falte-mitte:#0b3a44;--falte-dunkel:#05222a;--schiene-a:#7b8a91;--schiene-b:#2f3a3f}
-:root[data-theme="light"]{--falte-linie:#a99f8e;--falte-hell:#f6f2ea;--falte-mitte:#e6dfd2;--falte-dunkel:#c8bead;--schiene-a:#c9d0d4;--schiene-b:#7f8b91}
+/* Stoff leicht durchscheinend, damit die Seite dahinter zu ahnen ist */
+:root{--falte-linie:rgba(2,20,25,.9);--falte-hell:rgba(20,80,93,.9);--falte-mitte:rgba(11,58,68,.9);--falte-dunkel:rgba(5,34,42,.92);--schiene-a:#7b8a91;--schiene-b:#2f3a3f}
+:root[data-theme="light"]{--falte-linie:rgba(169,159,142,.9);--falte-hell:rgba(246,242,234,.88);--falte-mitte:rgba(230,223,210,.88);--falte-dunkel:rgba(200,190,173,.9);--schiene-a:#c9d0d4;--schiene-b:#7f8b91}
 /* Platz zum Scrollen, während die Seite oben stehen bleibt und das Plissee aufgeht */
 html.plissee-an body::after{content:"";display:block;height:var(--oeffnen,0px)}
 html.plissee-an .seite{position:sticky;top:0}
-.plissee{position:fixed;top:0;left:0;right:0;z-index:80;height:100vh;display:flex;flex-direction:column;pointer-events:none;filter:drop-shadow(0 14px 22px rgba(0,0,0,.4));will-change:height}
+.plissee{position:fixed;top:0;left:0;right:0;z-index:80;height:100vh;display:flex;flex-direction:column;pointer-events:none;will-change:height}
 .plissee .kopf{flex:none;height:14px;background:linear-gradient(var(--schiene-a),var(--schiene-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
-.plissee .stoff{--falte:22px;flex:1;position:relative;overflow:hidden;background-color:var(--falte-mitte);background-image:
+.plissee .stoff{--falte:22px;flex:1;position:relative;overflow:hidden;background-image:
   radial-gradient(ellipse 70% 55% at 50% 35%,rgba(255,255,255,.07),transparent 70%),
   repeating-linear-gradient(180deg,var(--falte-linie) 0,var(--falte-hell) calc(var(--falte) * .12),var(--falte-mitte) calc(var(--falte) * .5),var(--falte-dunkel) calc(var(--falte) * .5),var(--falte-mitte) calc(var(--falte) * .9),var(--falte-linie) var(--falte))}
 .plissee .stoff::before,.plissee .stoff::after{content:"";position:absolute;top:0;bottom:0;width:1.5px;background:rgba(255,255,255,.28)}
 :root[data-theme="light"] .plissee .stoff::before,:root[data-theme="light"] .plissee .stoff::after{background:rgba(60,50,40,.25)}
 .plissee .stoff::before{left:12%}
 .plissee .stoff::after{right:12%}
-.plissee .schiene{flex:none;position:relative;height:16px;background:linear-gradient(var(--schiene-a),var(--schiene-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+.plissee .schiene{flex:none;position:relative;height:16px;background:linear-gradient(var(--schiene-a),var(--schiene-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 10px 20px rgba(0,0,0,.35)}
 .plissee .griff{position:absolute;top:100%;left:50%;width:64px;height:10px;margin-left:-32px;border-radius:0 0 10px 10px;background:linear-gradient(var(--schiene-b),var(--schiene-a))}
-.plissee .info{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center;padding:1.5rem;color:var(--fg)}
+.plissee .info{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;text-align:center;padding:1.5rem;color:var(--fg);text-shadow:0 1px 12px var(--bg)}
 .plissee .info img{width:84px;height:auto;margin-bottom:.4rem}
 .plissee .info strong{font-size:clamp(1.8rem,6vw,2.8rem);font-weight:900;letter-spacing:-.02em;line-height:1.1}
 .plissee .info span{font-size:clamp(1rem,2.6vw,1.25rem);color:var(--soft);font-weight:600}
