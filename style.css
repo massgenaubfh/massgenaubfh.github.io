@@ -47,7 +47,7 @@
   --shadow:rgba(8,32,42,.35);
   --cta-a:#dff0f2;
   --cta-b:#eef7f8;
-  color-scheme:light;
+  color-scheme:only light;
 }
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
