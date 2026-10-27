@@ -53,7 +53,7 @@
 [hidden]{display:none!important}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--fg);transition:background-color .3s,color .3s;font-family:var(--sans);font-size:1.0625rem;line-height:1.55;-webkit-font-smoothing:antialiased}
-img{max-width:100%;display:block}
+img{max-width:100%;height:auto;display:block}
 a{color:var(--text-teal)}
 h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.02em;line-height:1.08;text-wrap:balance}
 p{margin:0}
@@ -217,13 +217,11 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 .sec-title .sub{margin-top:1rem}
 .contact-card .big.klein{font-size:1.1rem;word-break:break-word}
 
-/* Handy: runde Symbole und Nummern mittig, Kartentext zentriert */
-@media (max-width:720px){
-  .card .icon{margin-inline:auto}
-  .card:has(> .icon),.card.step{text-align:center}
-  .contact-card{align-items:center;text-align:center}
-  .step::before{left:50%;transform:translateX(-50%)}
-}
+/* Runde Symbole und Nummern mittig, Kartentext zentriert */
+.card .icon{margin-inline:auto}
+.card:has(> .icon),.card.step{text-align:center}
+.contact-card{align-items:center;text-align:center}
+.step::before{left:50%;transform:translateX(-50%)}
 
 /* Anfrage-Assistent */
 .assistent-link{margin-top:1.1rem}
