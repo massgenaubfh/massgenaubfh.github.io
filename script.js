@@ -55,13 +55,14 @@ if (seite && document.body.hasAttribute("data-plissee") && !plisseeGesehen && !m
     plissee.style.opacity = f < 0.85 ? 1 : Math.max(0, (1 - f) / 0.15);
     plissee.style.visibility = f >= 1 ? "hidden" : "visible";
   }
-  function messen() {
-    if (innerWidth === breite) return;   // Höhenänderung durch die Adressleiste am Handy ignorieren
+  // Größen kommen vom ResizeObserver (nach dem Layout), damit kein erzwungener Umbruch entsteht
+  const nav = document.querySelector(".nav");
+  const leiste = document.querySelector(".cta-leiste");
+  let navH = 0, leisteH = 0;
+  function messen(neu) {
+    if (!neu && innerWidth === breite) return;   // Höhenänderung durch die Adressleiste am Handy ignorieren
     breite = innerWidth;
-    const navH = document.querySelector(".nav").offsetHeight;
     document.documentElement.style.setProperty("--nav-h", navH + "px");
-    const leiste = document.querySelector(".cta-leiste");
-    const leisteH = leiste && getComputedStyle(leiste).display !== "none" ? leiste.offsetHeight : 0;
     hoehe = innerHeight - navH - leisteH - 10;   // zwischen Menü und Kontaktleiste, mit Platz für den Griff
     weg = Math.round(innerHeight * 0.85);
     document.documentElement.style.setProperty("--oeffnen", weg + "px");
@@ -72,8 +73,17 @@ if (seite && document.body.hasAttribute("data-plissee") && !plisseeGesehen && !m
     geplant = true;
     requestAnimationFrame(() => { geplant = false; zeichne(); });
   }, { passive: true });
-  addEventListener("resize", messen);
-  messen();
+  addEventListener("resize", () => messen());
+  const groesse = (e) => e.borderBoxSize && e.borderBoxSize[0] ? e.borderBoxSize[0].blockSize : e.contentRect.height;
+  const beobachter = new ResizeObserver((eintraege) => {
+    for (const e of eintraege) {
+      if (e.target === nav) navH = groesse(e);
+      else leisteH = groesse(e);   // ausgeblendet (display: none) = 0
+    }
+    messen(true);
+  });
+  beobachter.observe(nav);
+  if (leiste) beobachter.observe(leiste);
 
   // Sprungmarken auf derselben Seite: Öffnungsweg mit einrechnen
   document.addEventListener("click", (e) => {
