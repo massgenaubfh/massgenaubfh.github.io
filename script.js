@@ -27,17 +27,11 @@ if (themeBtn) {
   });
 }
 
-// Plissee-Intro: öffnet sich beim Scrollen nach oben
+// Plissee-Intro: öffnet sich beim Scrollen nach oben.
+// Steht fertig im HTML; das Kopf-Skript setzt html.plissee-an, wenn es gezeigt werden soll.
 const seite = document.querySelector(".seite");
-let plisseeGesehen = false;
-try { plisseeGesehen = sessionStorage.getItem("plissee") === "1"; sessionStorage.setItem("plissee", "1"); } catch (e) {}
-if (seite && document.body.hasAttribute("data-plissee") && !plisseeGesehen && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  document.documentElement.classList.add("plissee-an");
-  const plissee = document.createElement("div");
-  plissee.className = "plissee";
-  plissee.setAttribute("aria-hidden", "true");
-  plissee.innerHTML = '<div class="kopf"></div><div class="stoff"><div class="info"><img src="logo.svg" alt="" width="84" height="64"><strong>Maßgenau &amp; Mehr</strong><span>Fliegengitter &amp; Plissees nach Maß</span><em>Zum Öffnen scrollen</em></div></div><div class="schiene"><span class="griff"></span></div>';
-  seite.appendChild(plissee);          // innerhalb der Seite, damit das Menü darüber liegt
+const plissee = document.querySelector(".plissee");
+if (seite && plissee && document.documentElement.classList.contains("plissee-an")) {
   const stoff = plissee.querySelector(".stoff");
   const info = plissee.querySelector(".info");
   const SCHIENEN = 30;          // Kopf- und Unterschiene zusammen

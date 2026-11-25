@@ -376,6 +376,7 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
   .cta-leiste{display:flex;gap:.6rem;position:fixed;left:0;right:0;bottom:0;z-index:95;padding:.7rem 1rem calc(.7rem + env(safe-area-inset-bottom));background:var(--nav-bg);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-top:1px solid var(--nav-line)}
   .cta-leiste .pill{flex:1;padding:.75rem 1rem}
   footer{padding-bottom:6.5rem}
+  :root{--leiste-h:70px}   /* Startwert fürs Plissee, bis script.js genau misst */
 }
 
 /* Plissee-Intro: deckt die Seite beim Laden ab und faltet sich beim Scrollen nach oben (per Script eingeschaltet) */
@@ -385,7 +386,8 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 /* Platz zum Scrollen, während die Seite oben stehen bleibt und das Plissee aufgeht */
 html.plissee-an body::after{content:"";display:block;height:var(--oeffnen,0px)}
 html.plissee-an .seite{position:sticky;top:0}
-.plissee{position:fixed;top:var(--nav-h,64px);left:0;right:0;z-index:80;height:100vh;display:flex;flex-direction:column;pointer-events:none;will-change:height}
+html.plissee-an .plissee{display:flex}
+.plissee{position:fixed;top:var(--nav-h,64px);left:0;right:0;z-index:80;height:calc(100vh - var(--nav-h,64px) - var(--leiste-h,0px) - 10px);height:calc(100svh - var(--nav-h,64px) - var(--leiste-h,0px) - 10px);display:none;flex-direction:column;pointer-events:none;will-change:height}
 .plissee .kopf{flex:none;height:14px;background:linear-gradient(var(--schiene-a),var(--schiene-b));box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
 .plissee .stoff{--falte:22px;flex:1;position:relative;overflow:hidden;background-image:
   radial-gradient(ellipse 70% 55% at 50% 35%,rgba(255,255,255,.07),transparent 70%),
@@ -401,7 +403,7 @@ html.plissee-an .seite{position:sticky;top:0}
 .plissee .info strong{font-size:clamp(1.8rem,6vw,2.8rem);font-weight:900;letter-spacing:-.02em;line-height:1.1}
 .plissee .info span{font-size:clamp(1rem,2.6vw,1.25rem);color:var(--soft);font-weight:600}
 .plissee .info em{margin-top:1.6rem;font-style:normal;font-weight:700;color:var(--text-teal);display:flex;flex-direction:column;align-items:center;gap:.35rem}
-.plissee .info em::after{content:"";width:12px;height:12px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);animation:wippen 1.6s ease-in-out infinite}
+.plissee .info em::after{content:"";width:12px;height:12px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(45deg);animation:wippen 1.6s ease-in-out 4s infinite}
 @keyframes wippen{0%,100%{transform:translateY(0) rotate(45deg)}50%{transform:translateY(7px) rotate(45deg)}}
 
 /* Einblenden beim Scrollen */
@@ -440,7 +442,7 @@ html.plissee-an .seite{position:sticky;top:0}
       <a class="pill ghost" href="tel:+4915229551963"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>+49 1522 9551963</a>
     </div>
     <p class="assistent-link"><a class="more" href="anfrage.html?produkt=fliegengitter">Oder in 1 Minute mit dem Anfrage-Assistenten anfragen</a></p>
-    <div class="hero-img"><img srcset="bilder/projekt-fliegengitter-schiebetuer-600.webp 600w, bilder/projekt-fliegengitter-schiebetuer.webp 1400w" sizes="(max-width: 760px) 100vw, 1100px" decoding="async" width="1400" height="788" src="bilder/projekt-fliegengitter-schiebetuer.webp" alt="Von uns montiertes Fliegengitter an einer großen Terrassen- und Schiebetür" fetchpriority="high"></div>
+    <div class="hero-img"><img srcset="bilder/projekt-fliegengitter-schiebetuer-600.webp 600w, bilder/projekt-fliegengitter-schiebetuer-900.webp 900w, bilder/projekt-fliegengitter-schiebetuer.webp 1400w" sizes="(max-width: 760px) 100vw, 1100px" decoding="async" width="1400" height="788" src="bilder/projekt-fliegengitter-schiebetuer.webp" alt="Von uns montiertes Fliegengitter an einer großen Terrassen- und Schiebetür" fetchpriority="high"></div>
   </div>
 </div>
 
@@ -592,6 +594,6 @@ html.plissee-an .seite{position:sticky;top:0}
   <a class="pill ghost" href="tel:+4915229551963"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>Anrufen</a>
 </div>
 </div>
-<script src="script.js?v=851c95ac" defer></script>
+<script src="script.js?v=dd8bd0de" defer></script>
 </body>
 </html>
