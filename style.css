@@ -274,6 +274,11 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 @media (max-width:720px){.optionen{grid-template-columns:1fr 1fr;gap:.6rem}.option-box{padding:.9rem .5rem;border-radius:16px}.option-box strong{font-size:.95rem;line-height:1.25}.option-box small{font-size:.8rem}.o-icon{width:40px;height:40px}.o-icon svg{width:21px;height:21px}.assistent-nav .pill{flex:1}.teaser{text-align:center;justify-content:center}.teaser .pill{width:100%}}
 
 .orte-liste li{font-weight:600}
+.galerie{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(45%,220px),1fr));gap:.75rem}
+.galerie figure{margin:0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line)}
+.galerie img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
+.regio-foto{margin-top:1.4rem;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line)}
+.regio-foto img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
 .orte-mehr{color:var(--muted);font-size:.95rem;line-height:1.7}
 .foot-orte{margin:2rem 0 0;color:var(--muted);font-size:.85rem;line-height:1.7}
 .foot-orte a{white-space:nowrap;color:var(--muted)}
