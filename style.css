@@ -202,7 +202,7 @@ div.platzhalter{padding:1rem 1.2rem;margin-top:1rem}
 /* Footer */
 footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3rem 2rem;font-size:.95rem;color:var(--muted)}
 .foot{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:2rem}
-.foot h4{color:var(--strong);margin:0 0 .8rem;font-size:1rem}
+.foot h2{color:var(--strong);margin:0 0 .8rem;font-size:1rem;letter-spacing:normal;line-height:1.4}
 .foot ul{list-style:none;padding:0;margin:0;display:grid;gap:.45rem}
 .foot a{color:var(--muted);text-decoration:none}
 .foot a:hover{color:var(--strong)}
