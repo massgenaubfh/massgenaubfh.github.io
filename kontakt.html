@@ -290,14 +290,6 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 .feld{display:flex;flex-direction:column;gap:.35rem;font-weight:700;font-size:.92rem;color:var(--soft)}
 .feld input{width:100%;padding:.85rem 1rem;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-weight:600;font-size:1rem}
 .feld input:focus{outline:none;border-color:var(--teal-light)}
-.feld select,.feld textarea{width:100%;padding:.85rem 1rem;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--fg);font:inherit;font-weight:600;font-size:1rem}
-.feld textarea{resize:vertical;min-height:7.5rem}
-.feld select:focus,.feld textarea:focus{outline:none;border-color:var(--teal-light)}
-.mailformular{max-width:760px;margin:0 auto}
-.mailformular .sub-klein{color:var(--soft);margin:.4rem 0 0}
-.mailformular .feld.voll{margin-top:.8rem}
-.mailformular .links{margin-top:1.2rem}
-.mailformular .hinweis{margin-top:.8rem;color:var(--soft);font-size:.9rem}
 .anderer-ort{margin-top:1rem}
 .haken{display:flex;align-items:center;gap:.6rem;margin-top:1rem;font-weight:600;color:var(--soft);cursor:pointer}
 .haken input{width:20px;height:20px;accent-color:var(--teal)}
@@ -466,25 +458,6 @@ html.plissee-an .plissee{display:flex}
   </div>
 </section>
 
-<section style="padding-top:0">
-  <div class="wrap">
-    <form class="card mailformular rise" id="mailformular" action="mailto:info@massgenau-mehr.com" method="post" enctype="text/plain" novalidate>
-      <h2>Nachricht per E-Mail</h2>
-      <p class="sub-klein">Füllen Sie die Felder aus. Beim Absenden öffnet sich Ihr E-Mail-Programm mit der fertigen Nachricht, Sie müssen nur noch auf „Senden“ tippen.</p>
-      <div class="felder zwei">
-        <label class="feld"><span>Ihr Name</span><input type="text" name="name" autocomplete="name" required></label>
-        <label class="feld"><span>Ihr Ort</span><input type="text" name="ort" autocomplete="address-level2" placeholder="z. B. Neckarsulm"></label>
-        <label class="feld"><span>Telefon (optional)</span><input type="tel" name="telefon" autocomplete="tel" inputmode="tel"></label>
-        <label class="feld"><span>Worum geht es?</span><select name="thema"><option>Fliegengitter</option><option>Plissee</option><option>Fliegengitter und Plissee</option><option>Sonstiges</option></select></label>
-      </div>
-      <label class="feld voll"><span>Ihre Nachricht</span><textarea name="nachricht" rows="5" required placeholder="z. B. Anzahl der Fenster, ungefähre Maße, Wunschtermin"></textarea></label>
-      <p class="fehler" role="alert" hidden></p>
-      <div class="links start"><button type="submit" class="pill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m3 6 9 7 9-7"/></svg>E-Mail erstellen</button></div>
-      <p class="hinweis">Fotos können Sie in Ihrem E-Mail-Programm einfach anhängen.</p>
-    </form>
-  </div>
-</section>
-
 <section class="alt">
   <div class="wrap split">
     <div class="text rise">
@@ -557,6 +530,6 @@ html.plissee-an .plissee{display:flex}
   <a class="pill ghost" href="tel:+4915229551963"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>Anrufen</a>
 </div>
 </div>
-<script src="script.js?v=6ef10cc9" defer></script>
+<script src="script.js?v=39d373bb" defer></script>
 </body>
 </html>
