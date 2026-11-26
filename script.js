@@ -396,3 +396,30 @@ if ("IntersectionObserver" in window) {
 } else {
   teile.forEach((t) => t.classList.add("in"));
 }
+
+// Kontaktformular: öffnet das E-Mail-Programm mit fertiger Nachricht
+const mailForm = document.getElementById("mailformular");
+if (mailForm) {
+  const fehlerBox = mailForm.querySelector(".fehler");
+  mailForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const f = mailForm.elements;
+    const name = f.name.value.trim();
+    const nachricht = f.nachricht.value.trim();
+    if (!name || !nachricht) {
+      fehlerBox.textContent = "Bitte geben Sie Ihren Namen und eine kurze Nachricht ein.";
+      fehlerBox.hidden = false;
+      (name ? f.nachricht : f.name).focus();
+      return;
+    }
+    fehlerBox.hidden = true;
+    const zeilen = [`Name: ${name}`];
+    if (f.ort.value.trim()) zeilen.push(`Ort: ${f.ort.value.trim()}`);
+    if (f.telefon.value.trim()) zeilen.push(`Telefon: ${f.telefon.value.trim()}`);
+    zeilen.push(`Thema: ${f.thema.value}`);
+    const text = "Hallo,\n\n" + nachricht + "\n\n" + zeilen.join("\n") + "\n\nViele Grüße\n" + name;
+    location.href = "mailto:info@massgenau-mehr.com?subject=" + encodeURIComponent("Anfrage: " + f.thema.value)
+      + "&body=" + encodeURIComponent(text);
+  });
+  mailForm.addEventListener("input", () => (fehlerBox.hidden = true));
+}
