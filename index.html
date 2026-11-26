@@ -273,6 +273,14 @@ footer{background:var(--bg-2);border-top:1px solid var(--line);padding-block:3re
 .option-box small{color:var(--muted);font-size:.85rem;line-height:1.3}
 .o-icon{display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--teal-dark);color:#fff;margin-bottom:.2rem}
 .o-icon svg{width:24px;height:24px}
+.orte-titel{margin:1.1rem 0 .55rem;font-weight:600;color:var(--muted);font-size:.95rem}
+.orte-chips{display:flex;flex-wrap:wrap;gap:.5rem}
+.chip{position:relative;cursor:pointer}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:inline-block;padding:.55rem .95rem;border:1.5px solid var(--line);border-radius:999px;background:var(--bg);font-size:.95rem;font-weight:600;transition:border-color .2s,background-color .2s}
+.chip:hover span{border-color:var(--text-teal)}
+.chip input:checked + span{border-color:var(--teal-light);background:var(--surface-2);box-shadow:0 0 0 1px var(--teal-light) inset}
+.chip input:focus-visible + span{outline:3px solid var(--teal-light);outline-offset:2px}
 .mass-hilfe{display:flex;align-items:center;gap:1.2rem 1.6rem;flex-wrap:wrap;margin-bottom:1.4rem;color:var(--soft)}
 .mass-hilfe svg{width:170px;flex:none;color:var(--fg)}
 .mass-hilfe p{flex:1 1 260px;color:var(--muted)}
@@ -569,6 +577,6 @@ html.plissee-an .plissee{display:flex}
 </div>
 <div class="plissee" aria-hidden="true"><div class="kopf"></div><div class="stoff"><div class="info"><img src="logo.svg" alt="" width="84" height="64"><strong>Maßgenau &amp; Mehr</strong><span>Fliegengitter &amp; Plissees nach Maß</span><em>Zum Öffnen scrollen</em></div></div><div class="schiene"><span class="griff"></span></div></div>
 </div>
-<script src="script.js?v=dd8bd0de" defer></script>
+<script src="script.js?v=39d373bb" defer></script>
 </body>
 </html>

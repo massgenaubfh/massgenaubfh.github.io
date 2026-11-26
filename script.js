@@ -339,7 +339,7 @@ if (karte) {
     if (themeKnopf) themeKnopf.addEventListener("click", () => { if (map.isStyleLoaded()) faerben(map); });
 
     const anfrage = (ort) => {
-      const bekannt = ["Heilbronn", "Neckarsulm", "Bad Friedrichshall"].includes(ort);
+      const bekannt = ["Heilbronn", "Neckarsulm", "Bad Friedrichshall", "Bad Rappenau", "Brackenheim", "Obersulm", "Weinsberg", "Lauffen am Neckar", "Leingarten"].includes(ort);
       return `anfrage.html?ort=${encodeURIComponent(bekannt ? ort : "anderer Ort")}${bekannt ? "" : "&ortname=" + encodeURIComponent(ort)}`;
     };
     const status = (km) => km <= radius
