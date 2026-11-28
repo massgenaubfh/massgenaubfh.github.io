@@ -90,16 +90,20 @@ if (seite && plissee && document.documentElement.classList.contains("plissee-an"
   });
 }
 
-// Anfrage-Assistent: vier Schritte, Empfehlung, Nachricht per WhatsApp oder E-Mail
+// Anfrage-Assistent: fünf Schritte, Empfehlung, Nachricht per WhatsApp oder E-Mail.
+// Jeder Schritt bekommt einen Eintrag im Browser-Verlauf, damit die Zurück-Taste am Handy
+// einen Schritt zurückgeht statt die Seite zu verlassen.
 const form = document.getElementById("assistent");
 if (form) {
   const schritte = [...form.querySelectorAll(".schritt")];
   const balken = form.querySelector(".fortschritt span");
   const info = form.querySelector(".schritt-info");
   const fehler = form.querySelector(".fehler");
+  const nav = form.querySelector(".assistent-nav");
   const weiter = form.querySelector(".weiter");
   const zurueck = form.querySelector(".zurueck");
   const ergebnis = form.querySelector(".ergebnis");
+  const titelEl = form.querySelector(".empfehlung-titel");
   const wunschBlock = form.querySelector(".wunsch");
   const andererOrt = form.querySelector(".anderer-ort");
   let aktuell = 0;
@@ -107,49 +111,75 @@ if (form) {
   const wert = (name) => (form.querySelector(`[name="${name}"]:checked`) || {}).value || "";
   const feld = (name) => form.elements[name].value.trim();
   const mitPlissee = () => wert("produkt").includes("Plissee");
+  const mitGitter = () => wert("produkt") !== "Plissee";
+  const name = (i) => schritte[i].dataset.schritt;
+  const automatisch = (i) => schritte[i].hasAttribute("data-auto");
+  const markiere = (n, v) => { const el = form.querySelector(`[name="${n}"][value="${CSS.escape(v)}"]`); if (el) el.checked = true; return !!el; };
 
-  // Produkt aus dem Link übernehmen, z. B. anfrage.html?produkt=plissee
-  const vorwahl = new URLSearchParams(location.search).get("produkt");
-  const passend = { fliegengitter: "Fliegengitter", plissee: "Plissee" }[vorwahl];
-  if (passend) form.querySelector(`[name="produkt"][value="${passend}"]`).checked = true;
-  const ortVorwahl = new URLSearchParams(location.search).get("ort");
-  const ortFeld = ortVorwahl && form.querySelector(`[name="ort"][value="${CSS.escape(ortVorwahl)}"]`);
-  if (ortFeld) ortFeld.checked = true;
-  const ortName = new URLSearchParams(location.search).get("ortname");
-  if (ortName) form.elements.ortname.value = ortName;
+  // Vorauswahl aus dem Link, z. B. anfrage.html?produkt=plissee oder ?produkt=dachfenster&ort=Heilbronn
+  const para = new URLSearchParams(location.search);
+  const vorwahl = para.get("produkt");
+  const passend = { fliegengitter: "Fliegengitter", plissee: "Plissee", beides: "Fliegengitter und Plissee", dachfenster: "Plissee" }[vorwahl];
+  if (passend) markiere("produkt", passend);
+  if (vorwahl === "dachfenster") markiere("einsatz", "Dachfenster");
+  if (para.get("ort")) markiere("ort", para.get("ort"));
+  if (para.get("ortname")) form.elements.ortname.value = para.get("ortname");
 
-  function zeige(i) {
+  function nachOben() {
+    const oben = form.getBoundingClientRect().top;
+    if (oben < 70 || oben > innerHeight * 0.5) scrollTo({ top: oben + scrollY - 80, behavior: "smooth" });
+  }
+
+  function zeige(i, fokus) {
     aktuell = i;
+    ergebnis.hidden = true;
+    nav.hidden = false;
     schritte.forEach((s, k) => (s.hidden = k !== i));
     wunschBlock.hidden = !mitPlissee();
     andererOrt.hidden = wert("ort") !== "anderer Ort";
     balken.style.width = ((i + 1) / schritte.length) * 100 + "%";
     info.textContent = `Schritt ${i + 1} von ${schritte.length}`;
     zurueck.hidden = i === 0;
-    weiter.hidden = i < 2;   // Schritt 1 und 2 gehen beim Antippen automatisch weiter
+    weiter.hidden = automatisch(i);   // Auswahl-Schritte gehen beim Antippen automatisch weiter
     weiter.textContent = i === schritte.length - 1 ? "Empfehlung anzeigen" : "Weiter";
     fehler.hidden = true;
+    if (fokus) schritte[i].querySelector("legend").focus({ preventScroll: true });
+  }
+
+  // Neuer Schritt mit eigenem Verlaufseintrag; n zählt, wie viele Einträge der Assistent angelegt hat
+  function gehe(ziel) {
+    history.pushState({ assistent: ziel, n: (history.state?.n || 0) + 1 }, "");
+    ziel === "ergebnis" ? zeigeErgebnis() : zeige(ziel, true);
+    nachOben();
   }
 
   function pruefe(i) {
-    if (i === 0 && !wert("produkt")) return "Bitte wählen Sie aus, was Sie brauchen.";
-    if (i === 1 && !wert("einsatz")) return "Bitte wählen Sie aus, wofür es gedacht ist.";
-    if (i === 1 && mitPlissee() && !wert("wunsch")) return "Bitte wählen Sie aus, was Ihnen beim Plissee wichtig ist.";
-    if (i === 2 && !form.elements.unbekannt.checked) {
-      const b = +feld("breite"), h = +feld("hoehe");
-      if (!(b >= 10 && b <= 1000 && h >= 10 && h <= 1000)) return "Bitte geben Sie Breite und Höhe in Zentimetern an, oder setzen Sie den Haken, wenn Sie die Maße noch nicht kennen.";
+    const s = name(i);
+    if (s === "produkt" && !wert("produkt")) return "Bitte wählen Sie aus, was Sie brauchen.";
+    if (s === "einsatz" && !wert("einsatz")) return "Bitte wählen Sie aus, wofür es gedacht ist.";
+    if (s === "einsatz" && mitPlissee() && !wert("wunsch")) return "Bitte wählen Sie aus, was Ihnen beim Plissee wichtig ist.";
+    if (s === "masse") {
+      if (!form.elements.unbekannt.checked) {
+        const b = +feld("breite"), h = +feld("hoehe");
+        if (!(b >= 10 && b <= 1000 && h >= 10 && h <= 1000)) return "Bitte geben Sie Breite und Höhe in Zentimetern an, oder setzen Sie den Haken, wenn Sie die Maße noch nicht kennen.";
+      }
+      const a = +(feld("anzahl") || 1);
+      if (!(Number.isInteger(a) && a >= 1 && a <= 50)) return "Bitte geben Sie bei „Anzahl“ eine Zahl zwischen 1 und 50 an.";
     }
-    if (i === 3 && !wert("ort")) return "Bitte wählen Sie Ihren Ort aus.";
-    if (i === 3 && wert("ort") === "anderer Ort" && !feld("ortname")) return "Bitte geben Sie Ihren Ort an.";
+    if (s === "zeit" && !wert("zeit")) return "Bitte wählen Sie aus, wann es losgehen soll.";
+    if (s === "ort" && !wert("ort")) return "Bitte wählen Sie Ihren Ort aus.";
+    if (s === "ort" && wert("ort") === "anderer Ort" && !feld("ortname")) return "Bitte geben Sie Ihren Ort an.";
     return "";
   }
 
   function empfehlung() {
     const einsatz = wert("einsatz"), punkte = [];
+    const dach = einsatz === "Dachfenster";
     let titel = "";
-    if (wert("produkt") !== "Plissee") {
+    if (mitGitter()) {
       const gitter = {
         "Fenster": "Fliegengitter mit festem Rahmen, passgenau im Fenster",
+        "Dachfenster": "Insektenschutz für Ihr Dachfenster: die passende Lösung klären wir bei der Beratung",
         "Balkon- oder Terrassentür": "Fliegengitter-Tür oder platzsparendes Plissee-Fliegengitter",
         "Schiebetür / große Fensterfront": "Plissee-Fliegengitter oder Schiebe-Fliegengitter für große Öffnungen",
       }[einsatz] || "Fliegengitter nach Maß, passend zu Ihrer Einbausituation";
@@ -157,13 +187,14 @@ if (form) {
       titel = "Ihr Fliegengitter nach Maß";
     }
     if (mitPlissee()) {
+      if (dach) punkte.push("Dachfenster-Plissee in seitlichen Führungsschienen, bleibt bei jeder Dachneigung in Position");
       const stoff = {
         "Sichtschutz": "Plissee mit lichtdurchlässigem Stoff: hell, aber blickdicht",
         "Abdunkeln": "Plissee mit abdunkelndem Stoff für erholsamen Schlaf",
         "Wärmeschutz": "Wabenplissee mit Luftkammern gegen Hitze und Kälte",
       }[wert("wunsch")] || "Plissee nach Maß, Stoff wählen wir gemeinsam aus";
       punkte.push(stoff);
-      titel = titel ? "Fliegengitter und Plissee nach Maß" : "Ihr Plissee nach Maß";
+      titel = titel ? "Fliegengitter und Plissee nach Maß" : dach ? "Ihr Dachfenster-Plissee nach Maß" : "Ihr Plissee nach Maß";
     }
     punkte.push("Exakt nach Maß gefertigt und fachgerecht montiert");
     return { titel, punkte };
@@ -174,7 +205,7 @@ if (form) {
     const masse = form.elements.unbekannt.checked ? "noch unbekannt" : `ca. ${feld("breite")} × ${feld("hoehe")} cm`;
     const liste = [["Produkt", wert("produkt")], ["Für", wert("einsatz")]];
     if (mitPlissee()) liste.push(["Wunsch", wert("wunsch")]);
-    liste.push(["Maße", masse], ["Anzahl", feld("anzahl") || "1"], ["Ort", ort]);
+    liste.push(["Maße", masse], ["Anzahl", feld("anzahl") || "1"], ["Zeitpunkt", wert("zeit")], ["Ort", ort]);
     if (feld("name")) liste.push(["Name", feld("name")]);
     if (feld("nachricht")) liste.push(["Nachricht", feld("nachricht")]);
     return liste;
@@ -183,37 +214,42 @@ if (form) {
   function zeigeErgebnis() {
     const { titel, punkte } = empfehlung();
     const liste = angaben();
-    form.querySelector(".empfehlung-titel").textContent = titel;
-    form.querySelector(".empfehlung-liste").innerHTML = "";
-    punkte.forEach((p) => { const li = document.createElement("li"); li.textContent = p; form.querySelector(".empfehlung-liste").append(li); });
+    titelEl.textContent = titel;
+    const ul = form.querySelector(".empfehlung-liste");
+    ul.replaceChildren(...punkte.map((p) => { const li = document.createElement("li"); li.textContent = p; return li; }));
     const dl = document.createElement("dl");
     liste.forEach(([k, v]) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd); });
     form.querySelector(".zusammenfassung").replaceChildren(dl);
     const text = "Hallo, ich habe den Anfrage-Assistenten auf Ihrer Website genutzt und hätte gern eine kostenlose Beratung:\n\n"
       + liste.map(([k, v]) => `• ${k}: ${v}`).join("\n")
       + `\n\nEmpfehlung laut Assistent: ${punkte.slice(0, -1).join("; ")}\n\nVielen Dank!`;
-    form.querySelector(".senden-wa").href = "https://wa.me/4915229551963?text=" + encodeURIComponent(text);
-    form.querySelector(".senden-mail").href = "mailto:info@massgenau-mehr.com?subject=" + encodeURIComponent("Anfrage: " + wert("produkt")) + "&body=" + encodeURIComponent(text);
+    form.querySelector(".senden-wa").href = form.dataset.wa + "?text=" + encodeURIComponent(text);
+    form.querySelector(".senden-mail").href = "mailto:" + form.dataset.mail + "?subject=" + encodeURIComponent("Anfrage: " + wert("produkt")) + "&body=" + encodeURIComponent(text);
     schritte.forEach((s) => (s.hidden = true));
-    form.querySelector(".assistent-nav").hidden = true;
+    nav.hidden = true;
     info.textContent = "Fertig!";
     balken.style.width = "100%";
     fehler.hidden = true;
     ergebnis.hidden = false;
-    scrollTo({ top: form.getBoundingClientRect().top + scrollY - 80, behavior: "smooth" });
+    titelEl.tabIndex = -1;
+    titelEl.focus({ preventScroll: true });
   }
 
   weiter.addEventListener("click", () => {
     const meldung = pruefe(aktuell);
     if (meldung) { fehler.textContent = meldung; fehler.hidden = false; return; }
-    if (aktuell < schritte.length - 1) zeige(aktuell + 1);
-    else zeigeErgebnis();
+    gehe(aktuell < schritte.length - 1 ? aktuell + 1 : "ergebnis");
   });
-  zurueck.addEventListener("click", () => zeige(aktuell - 1));
-  form.querySelector(".neu-start").addEventListener("click", () => {
-    ergebnis.hidden = true;
-    form.querySelector(".assistent-nav").hidden = false;
-    zeige(0);
+  zurueck.addEventListener("click", () => {
+    if (history.state?.n > 0) history.back();
+    else { zeige(aktuell - 1, true); history.replaceState({ assistent: aktuell, n: 0 }, ""); }
+  });
+  form.querySelector(".neu-start").addEventListener("click", () => gehe(0));
+  addEventListener("popstate", (e) => {
+    const ziel = e.state?.assistent;
+    if (ziel === undefined) return;
+    ziel === "ergebnis" ? zeigeErgebnis() : zeige(ziel, true);
+    nachOben();
   });
   form.addEventListener("change", () => {
     wunschBlock.hidden = !mitPlissee();
@@ -225,27 +261,22 @@ if (form) {
   let timer;
   form.addEventListener("click", (e) => {
     const eingabe = e.target.closest(".option input");
-    if (!eingabe) return;
+    if (!eingabe || !automatisch(aktuell)) return;
     clearTimeout(timer);
-    let fertig = false;
-    if (aktuell === 0) fertig = true;
-    if (aktuell === 1) {
-      fertig = wert("einsatz") && (!mitPlissee() || wert("wunsch"));
-      // Beim Plissee nach dem Einsatzort zur zweiten Frage scrollen
-      if (!fertig && eingabe.name === "einsatz") {
-        wunschBlock.hidden = false;
-        setTimeout(() => wunschBlock.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
-      }
+    // Beim Plissee nach dem Einsatzort zur zweiten Frage scrollen
+    if (eingabe.name === "einsatz" && mitPlissee() && !wert("wunsch")) {
+      wunschBlock.hidden = false;
+      setTimeout(() => wunschBlock.scrollIntoView({ behavior: "smooth", block: "center" }), 150);
     }
-    if (!fertig) return;
-    timer = setTimeout(() => {
-      zeige(aktuell + 1);
-      const oben = form.getBoundingClientRect().top;
-      if (oben < 70 || oben > innerHeight * 0.5) scrollTo({ top: oben + scrollY - 80, behavior: "smooth" });
-    }, 280);
+    if (pruefe(aktuell)) return;
+    timer = setTimeout(() => gehe(aktuell + 1), 280);
   });
   form.addEventListener("submit", (e) => e.preventDefault());
-  zeige(0);
+
+  // Mit Vorauswahl gleich bei Schritt 2 beginnen
+  const start = passend ? 1 : 0;
+  zeige(start, false);
+  history.replaceState({ assistent: start, n: 0 }, "");
 }
 
 // Interaktive Einsatzgebiet-Karte (lädt OpenFreeMap erst nach Zustimmung)
